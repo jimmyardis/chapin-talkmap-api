@@ -140,5 +140,11 @@
       "pop_2020": 4562,
       "growth_pct": 27.25
     }
-  ]
+  ],
+  "area_wide_demographics": {
+    "median_household_income_USD": 64539,
+    "median_age_years": 38.0,
+    "median_tract_density_per_sqkm": 544.2,
+    "note": "ACS 2022 5-year estimates (period 2018-2022) for Lexington + Richland tracts"
+  }
 }

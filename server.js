@@ -161,6 +161,92 @@ const TOOLS = {
       ? { error: `No data for county "${county}".` }
       : { years: result };
   },
+
+  /**
+   * Aggregate any tract-level metric across a named area.
+   *
+   * area: 'Lexington' | 'Richland' | 'Greater Chapin' | 'ZIP 29036' | 'both'
+   * metric: any tract property — 'median_income', 'median_age', 'pop_2020',
+   *         'density_per_sqkm', 'pct_white', 'pct_black', 'pct_hispanic',
+   *         'pct_nonwhite', 'growth_pct', etc.
+   * operation: 'average' | 'median' | 'sum' | 'min' | 'max' | 'population_weighted_average'
+   */
+  aggregate_tracts({ area, metric, operation = 'population_weighted_average' }) {
+    if (!area)   return { error: 'Need an area (e.g. "Lexington County", "Greater Chapin").' };
+    if (!metric) return { error: 'Need a metric (e.g. "median_income", "median_age").' };
+
+    const a = String(area).toLowerCase().trim();
+
+    // Pick which tracts to aggregate over
+    let pool, areaLabel;
+    if (a.includes('greater chapin') || a.includes('29036') || a === 'chapin' || a === 'chapin area') {
+      pool = tracts.features.filter(f => f.properties.is_greater_chapin === true);
+      areaLabel = 'Greater Chapin (ZIP 29036 footprint)';
+    } else if (a.includes('lexington')) {
+      pool = tracts.features.filter(f => String(f.properties.county_name || '').toLowerCase() === 'lexington');
+      areaLabel = 'Lexington County, SC';
+    } else if (a.includes('richland')) {
+      pool = tracts.features.filter(f => String(f.properties.county_name || '').toLowerCase() === 'richland');
+      areaLabel = 'Richland County, SC';
+    } else if (a === 'both' || a.includes('both counties')) {
+      pool = tracts.features;
+      areaLabel = 'Lexington + Richland Counties combined';
+    } else {
+      return {
+        error: `Unknown area "${area}". Try: 'Lexington County', 'Richland County', 'Greater Chapin', 'ZIP 29036', or 'both'.`
+      };
+    }
+
+    if (pool.length === 0) return { error: `No tracts in area "${area}".` };
+
+    // Pull metric values + populations (for weighted ops)
+    const samples = pool
+      .map(f => ({
+        value:      typeof f.properties[metric] === 'number' ? f.properties[metric] : (parseFloat(f.properties[metric]) || null),
+        population: typeof f.properties.pop_2020 === 'number' ? f.properties.pop_2020 : 0,
+      }))
+      .filter(s => s.value != null && !isNaN(s.value));
+
+    if (samples.length === 0) {
+      return { error: `No data for metric "${metric}" in "${areaLabel}". Check the metric name.` };
+    }
+
+    // Aggregators
+    const aggregators = {
+      average: () => samples.reduce((a, b) => a + b.value, 0) / samples.length,
+      sum:     () => samples.reduce((a, b) => a + b.value, 0),
+      min:     () => Math.min(...samples.map(s => s.value)),
+      max:     () => Math.max(...samples.map(s => s.value)),
+      median:  () => {
+        const sorted = samples.map(s => s.value).sort((a, b) => a - b);
+        const n = sorted.length;
+        return n % 2 ? sorted[Math.floor(n / 2)] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+      },
+      population_weighted_average: () => {
+        const totalPop = samples.reduce((a, b) => a + b.population, 0);
+        if (totalPop === 0) return samples.reduce((a, b) => a + b.value, 0) / samples.length;
+        return samples.reduce((a, b) => a + b.value * b.population, 0) / totalPop;
+      },
+    };
+
+    const fn = aggregators[operation];
+    if (!fn) {
+      return { error: `Unknown operation "${operation}". Try: ${Object.keys(aggregators).join(', ')}.` };
+    }
+
+    const raw = fn();
+    const value = typeof raw === 'number' ? Math.round(raw * 100) / 100 : raw;
+
+    return {
+      area: areaLabel,
+      metric,
+      operation,
+      value,
+      tracts_used: samples.length,
+      tracts_in_area: pool.length,
+      total_population_in_area: pool.reduce((a, b) => a + (Number(b.properties.pop_2020) || 0), 0),
+    };
+  },
 };
 
 // =============================================================
