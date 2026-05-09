@@ -33,6 +33,43 @@ const summary = JSON.parse(fs.readFileSync(path.join(dataDir, 'chapin-area-summa
 
 console.log(`📚 Loaded ${tracts.features.length} tracts, ${places.features.length} places, ${Object.keys(summary.county_population_by_year || {}).length} counties.`);
 
+// Helper: compute population-weighted area aggregates for any list of tract features
+// Returns demographics suitable for an LLM to weave into a conversation.
+function computeAreaAggregates(tractFeatures, areaLabel) {
+  if (!tractFeatures || tractFeatures.length === 0) {
+    return { error: `No tracts in ${areaLabel}.` };
+  }
+
+  const totalPop = tractFeatures.reduce((a, b) => a + (Number(b.properties.pop_2020) || 0), 0);
+
+  function popWeighted(prop) {
+    const samples = tractFeatures
+      .map(f => ({ value: Number(f.properties[prop]), pop: Number(f.properties.pop_2020) || 0 }))
+      .filter(s => !isNaN(s.value) && s.pop > 0);
+    if (samples.length === 0 || totalPop === 0) return null;
+    const sum = samples.reduce((a, b) => a + b.value * b.pop, 0);
+    const popUsed = samples.reduce((a, b) => a + b.pop, 0);
+    return Math.round((sum / popUsed) * 100) / 100;
+  }
+
+  return {
+    area: areaLabel,
+    tract_count: tractFeatures.length,
+    total_population_2020: totalPop,
+    median_household_income_USD: popWeighted('median_income'),
+    median_age_years: popWeighted('median_age'),
+    population_density_per_sqkm: popWeighted('density_per_sqkm'),
+    racial_composition: {
+      pct_white_alone: popWeighted('pct_white'),
+      pct_black_alone: popWeighted('pct_black'),
+      pct_asian_alone: popWeighted('pct_asian'),
+      pct_hispanic_origin: popWeighted('pct_hispanic'),
+      pct_other_or_multiracial: popWeighted('pct_other'),
+      pct_non_white: popWeighted('pct_nonwhite'),
+    },
+  };
+}
+
 // =============================================================
 // TOOL IMPLEMENTATIONS
 // =============================================================
@@ -50,6 +87,9 @@ const TOOLS = {
     if (summary.county_population_by_year) {
       for (const [county, years] of Object.entries(summary.county_population_by_year)) {
         if (n.includes(county.toLowerCase())) {
+          const countyTracts = tracts.features.filter(
+            f => String(f.properties.county_name || '').toLowerCase() === county.toLowerCase()
+          );
           return {
             name: `${county} County, SC`,
             type: 'county',
@@ -57,6 +97,7 @@ const TOOLS = {
             growth_2000_2020_pct: years[2000] && years[2020]
               ? Math.round((years[2020] - years[2000]) / years[2000] * 1000) / 10
               : null,
+            demographics: computeAreaAggregates(countyTracts, `${county} County`),
             note: county === 'Lexington'
               ? 'Most of Chapin proper is in Lexington County.'
               : 'White Rock and the eastern Greater Chapin area are in Richland County.',
@@ -73,11 +114,23 @@ const TOOLS = {
         return dn.includes(n) || (bn && (n.includes(bn) || bn.includes(n)));
       });
       if (place) {
-        return {
+        const result = {
           name: place.properties.display_name,
           type: place.properties.kind,
           notes: place.properties.tooltip,
         };
+
+        // For ZIP 29036 / Chapin / Chapin-related, attach Greater Chapin aggregates
+        const dn = String(place.properties.display_name || '').toLowerCase();
+        const isChapinish = dn.includes('chapin') || dn.includes('29036') ||
+                            n.includes('chapin') || n.includes('29036') ||
+                            n.includes('white rock') || n.includes('ballentine');
+
+        if (isChapinish) {
+          const greaterChapin = tracts.features.filter(f => f.properties.is_greater_chapin === true);
+          result.greater_chapin_aggregates = computeAreaAggregates(greaterChapin, 'Greater Chapin area');
+        }
+        return result;
       }
     }
 
