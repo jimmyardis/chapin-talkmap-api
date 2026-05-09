@@ -39,10 +39,12 @@ console.log(`📚 Loaded ${tracts.features.length} tracts, ${places.features.len
 const TOOLS = {
   /**
    * Look up info about any named place — town, CDP, ZIP, county, or tract.
+   * Optional `year` parameter (2014-2022) returns historical population for tracts.
    */
-  get_place_info({ name }) {
+  get_place_info({ name, year }) {
     if (!name) return { error: 'Need a place name to look up.' };
     const n = String(name).toLowerCase().trim();
+    const yearStr = year != null ? String(year) : null;
 
     // 1. Counties
     if (summary.county_population_by_year) {
@@ -88,20 +90,69 @@ const TOOLS = {
     });
     if (tract) {
       const p = tract.properties;
-      return {
+      const result = {
         name: p.NAME,
         type: 'census_tract',
         county: `${p.county_name} County, SC`,
         population_2010: p.pop_2010,
         population_2020: p.pop_2020,
         growth_pct_2010_to_2020: p.growth_pct,
-        note: p.has_2010
-          ? null
-          : 'This tract did not exist in 2010 — it was created when an older tract was split (often a fast-growth area).',
+        median_household_income: p.median_income,
+        median_age: p.median_age,
+        density_per_sqkm: p.density_per_sqkm,
+        is_greater_chapin: p.is_greater_chapin === true,
       };
+      if (yearStr && p[`pop_${yearStr}`] != null) {
+        result[`population_${yearStr}`] = p[`pop_${yearStr}`];
+      }
+      // Always include annual history if available
+      const history = {};
+      for (let y = 2014; y <= 2022; y++) {
+        if (p[`pop_${y}`] != null) history[y] = p[`pop_${y}`];
+      }
+      if (Object.keys(history).length > 0) result.population_history = history;
+      result.note = p.has_2010
+        ? null
+        : 'This tract did not exist in 2010 — created when an older tract was split (often a fast-growth area).';
+      return result;
     }
 
     return { error: `Couldn't find a place matching "${name}".` };
+  },
+
+  /**
+   * Get a tract's annual population history (2014-2022 ACS estimates).
+   * Useful for the voice agent to answer trend questions.
+   */
+  get_tract_population_history({ tract }) {
+    if (!tract) return { error: 'Need a tract identifier (e.g. "210.19" or "021019").' };
+    const digits = String(tract).replace(/\D/g, '');
+    const feat = tracts.features.find(f => {
+      const t = String(f.properties.TRACT || '');
+      return digits && t.includes(digits);
+    });
+    if (!feat) return { error: `No tract found matching "${tract}".` };
+
+    const p = feat.properties;
+    const history = {};
+    for (let y = 2014; y <= 2022; y++) {
+      if (p[`pop_${y}`] != null) history[y] = p[`pop_${y}`];
+    }
+    if (Object.keys(history).length === 0) {
+      return { error: `Tract ${tract} has no annual population data.` };
+    }
+    const yrs = Object.keys(history).map(Number).sort();
+    const first = history[yrs[0]];
+    const last = history[yrs[yrs.length - 1]];
+    return {
+      tract: p.NAME,
+      county: `${p.county_name} County, SC`,
+      annual_population: history,
+      change_first_to_last: last - first,
+      change_pct: first > 0 ? Math.round((last - first) / first * 1000) / 10 : null,
+      first_year: yrs[0],
+      last_year: yrs[yrs.length - 1],
+    };
   },
 
   /**
