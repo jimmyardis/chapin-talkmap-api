@@ -1,0 +1,144 @@
+{
+  "name": "Greater Chapin area Census tracts",
+  "counties": [
+    "Lexington County, SC",
+    "Richland County, SC"
+  ],
+  "tract_count": 190,
+  "tracts_with_2010_data": 133,
+  "tracts_new_since_2010": 57,
+  "county_population_by_year": {
+    "Lexington": {
+      "2000": 216014,
+      "2010": 262391,
+      "2020": 293991
+    },
+    "Richland": {
+      "2000": 320677,
+      "2010": 384504,
+      "2020": 416147
+    }
+  },
+  "fastest_growing_tracts": [
+    {
+      "county": "Richland",
+      "tract": "980100",
+      "name": "Census Tract 9801",
+      "pop_2010": 22,
+      "pop_2020": 463,
+      "growth_pct": 2004.55
+    },
+    {
+      "county": "Richland",
+      "tract": "003100",
+      "name": "Census Tract 31",
+      "pop_2010": 1213,
+      "pop_2020": 3264,
+      "growth_pct": 169.08
+    },
+    {
+      "county": "Richland",
+      "tract": "010806",
+      "name": "Census Tract 108.06",
+      "pop_2010": 555,
+      "pop_2020": 1176,
+      "growth_pct": 111.89
+    },
+    {
+      "county": "Richland",
+      "tract": "011407",
+      "name": "Census Tract 114.07",
+      "pop_2010": 3162,
+      "pop_2020": 5878,
+      "growth_pct": 85.9
+    },
+    {
+      "county": "Lexington",
+      "tract": "021019",
+      "name": "Census Tract 210.19",
+      "pop_2010": 1369,
+      "pop_2020": 2529,
+      "growth_pct": 84.73
+    },
+    {
+      "county": "Richland",
+      "tract": "001600",
+      "name": "Census Tract 16",
+      "pop_2010": 1236,
+      "pop_2020": 2272,
+      "growth_pct": 83.82
+    },
+    {
+      "county": "Richland",
+      "tract": "010502",
+      "name": "Census Tract 105.02",
+      "pop_2010": 643,
+      "pop_2020": 1101,
+      "growth_pct": 71.23
+    },
+    {
+      "county": "Richland",
+      "tract": "002900",
+      "name": "Census Tract 29",
+      "pop_2010": 3232,
+      "pop_2020": 5124,
+      "growth_pct": 58.54
+    },
+    {
+      "county": "Lexington",
+      "tract": "021303",
+      "name": "Census Tract 213.03",
+      "pop_2010": 3272,
+      "pop_2020": 4577,
+      "growth_pct": 39.88
+    },
+    {
+      "county": "Lexington",
+      "tract": "021204",
+      "name": "Census Tract 212.04",
+      "pop_2010": 3654,
+      "pop_2020": 4873,
+      "growth_pct": 33.36
+    },
+    {
+      "county": "Lexington",
+      "tract": "021021",
+      "name": "Census Tract 210.21",
+      "pop_2010": 1471,
+      "pop_2020": 1957,
+      "growth_pct": 33.04
+    },
+    {
+      "county": "Richland",
+      "tract": "010104",
+      "name": "Census Tract 101.04",
+      "pop_2010": 3857,
+      "pop_2020": 5057,
+      "growth_pct": 31.11
+    },
+    {
+      "county": "Lexington",
+      "tract": "020605",
+      "name": "Census Tract 206.05",
+      "pop_2010": 1852,
+      "pop_2020": 2397,
+      "growth_pct": 29.43
+    },
+    {
+      "county": "Lexington",
+      "tract": "021115",
+      "name": "Census Tract 211.15",
+      "pop_2010": 2099,
+      "pop_2020": 2700,
+      "growth_pct": 28.63
+    },
+    {
+      "county": "Lexington",
+      "tract": "020506",
+      "name": "Census Tract 205.06",
+      "pop_2010": 3585,
+      "pop_2020": 4562,
+      "growth_pct": 27.25
+    }
+  ]
+}

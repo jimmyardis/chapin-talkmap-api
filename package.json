@@ -1,0 +1,16 @@
+{
+  "name": "chapin-talkmap-api",
+  "version": "1.0.0",
+  "description": "Voice tool API for The Chapin Map — three Vapi-callable endpoints backed by static GeoJSON data.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
