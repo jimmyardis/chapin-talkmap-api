@@ -1,0 +1,275 @@
+{
+  "county_population_by_year": {
+    "Charleston": {
+      "2000": 309969,
+      "2010": 350209,
+      "2020": 407543,
+      "2014": 365674,
+      "2015": 372904,
+      "2016": 380673,
+      "2017": 387847,
+      "2018": 394708,
+      "2019": 401165,
+      "2021": 404946,
+      "2022": 409840
+    },
+    "Berkeley": {
+      "2000": 142651,
+      "2010": 177843,
+      "2020": 222103,
+      "2014": 188835,
+      "2015": 193613,
+      "2016": 199081,
+      "2017": 204632,
+      "2018": 209065,
+      "2019": 215044,
+      "2021": 224806,
+      "2022": 231419
+    },
+    "Dorchester": {
+      "2000": 96413,
+      "2010": 136555,
+      "2020": 161309,
+      "2014": 142772,
+      "2015": 145715,
+      "2016": 148517,
+      "2017": 151716,
+      "2018": 155474,
+      "2019": 158299,
+      "2021": 160180,
+      "2022": 162139
+    }
+  },
+  "tri_county_totals": {
+    "tracts": 178,
+    "greater_charleston_tracts": 137,
+    "counties": [
+      "Charleston",
+      "Berkeley",
+      "Dorchester"
+    ]
+  },
+  "fastest_growing_tracts": [
+    {
+      "name": "Census Tract 207.11",
+      "county": "Berkeley",
+      "value": 415.44
+    },
+    {
+      "name": "Census Tract 207.13",
+      "county": "Berkeley",
+      "value": 200.21
+    },
+    {
+      "name": "Census Tract 105.03",
+      "county": "Dorchester",
+      "value": 114.84
+    },
+    {
+      "name": "Census Tract 204.04",
+      "county": "Berkeley",
+      "value": 88.24
+    },
+    {
+      "name": "Census Tract 32",
+      "county": "Charleston",
+      "value": 88.06
+    }
+  ],
+  "declining_tracts": [
+    {
+      "name": "Census Tract 7",
+      "county": "Charleston",
+      "value": -30.59
+    },
+    {
+      "name": "Census Tract 39",
+      "county": "Charleston",
+      "value": -26.54
+    },
+    {
+      "name": "Census Tract 1",
+      "county": "Charleston",
+      "value": -24.58
+    },
+    {
+      "name": "Census Tract 207.19",
+      "county": "Berkeley",
+      "value": -24.13
+    },
+    {
+      "name": "Census Tract 20.04",
+      "county": "Charleston",
+      "value": -20.69
+    }
+  ],
+  "most_populous_tracts": [
+    {
+      "name": "Census Tract 108.13",
+      "county": "Dorchester",
+      "value": 11915
+    },
+    {
+      "name": "Census Tract 207.11",
+      "county": "Berkeley",
+      "value": 10312
+    },
+    {
+      "name": "Census Tract 31.06",
+      "county": "Charleston",
+      "value": 10150
+    },
+    {
+      "name": "Census Tract 46.16",
+      "county": "Charleston",
+      "value": 9892
+    },
+    {
+      "name": "Census Tract 207.16",
+      "county": "Berkeley",
+      "value": 9431
+    }
+  ],
+  "highest_income_tracts": [
+    {
+      "name": "Census Tract 46.13",
+      "county": "Charleston",
+      "value": 228214
+    },
+    {
+      "name": "Census Tract 21.04",
+      "county": "Charleston",
+      "value": 214250
+    },
+    {
+      "name": "Census Tract 2",
+      "county": "Charleston",
+      "value": 180491
+    },
+    {
+      "name": "Census Tract 49.02",
+      "county": "Charleston",
+      "value": 176850
+    },
+    {
+      "name": "Census Tract 48",
+      "county": "Charleston",
+      "value": 171838
+    }
+  ],
+  "lowest_income_tracts": [
+    {
+      "name": "Census Tract 202.01",
+      "county": "Berkeley",
+      "value": 25674
+    },
+    {
+      "name": "Census Tract 7",
+      "county": "Charleston",
+      "value": 29255
+    },
+    {
+      "name": "Census Tract 4",
+      "county": "Charleston",
+      "value": 31016
+    },
+    {
+      "name": "Census Tract 43",
+      "county": "Charleston",
+      "value": 31903
+    },
+    {
+      "name": "Census Tract 37",
+      "county": "Charleston",
+      "value": 33991
+    }
+  ],
+  "youngest_tracts": [
+    {
+      "name": "Census Tract 207.24",
+      "county": "Berkeley",
+      "value": 20.7
+    },
+    {
+      "name": "Census Tract 32",
+      "county": "Charleston",
+      "value": 20.8
+    },
+    {
+      "name": "Census Tract 207.25",
+      "county": "Berkeley",
+      "value": 20.8
+    },
+    {
+      "name": "Census Tract 4",
+      "county": "Charleston",
+      "value": 21.3
+    },
+    {
+      "name": "Census Tract 7",
+      "county": "Charleston",
+      "value": 21.7
+    }
+  ],
+  "oldest_tracts": [
+    {
+      "name": "Census Tract 21.05",
+      "county": "Charleston",
+      "value": 68.2
+    },
+    {
+      "name": "Census Tract 21.04",
+      "county": "Charleston",
+      "value": 66.8
+    },
+    {
+      "name": "Census Tract 20.04",
+      "county": "Charleston",
+      "value": 65.5
+    },
+    {
+      "name": "Census Tract 2",
+      "county": "Charleston",
+      "value": 63.2
+    },
+    {
+      "name": "Census Tract 23",
+      "county": "Charleston",
+      "value": 59.9
+    }
+  ],
+  "most_diverse_tracts": [
+    {
+      "name": "Census Tract 9901",
+      "county": "Charleston",
+      "value": 100.0
+    },
+    {
+      "name": "Census Tract 9801",
+      "county": "Berkeley",
+      "value": 100.0
+    },
+    {
+      "name": "Census Tract 40",
+      "county": "Charleston",
+      "value": 94.7
+    },
+    {
+      "name": "Census Tract 38",
+      "county": "Charleston",
+      "value": 90.0
+    },
+    {
+      "name": "Census Tract 43",
+      "county": "Charleston",
+      "value": 89.9
+    }
+  ],
+  "city": "Charleston",
+  "state": "SC",
+  "county": "Charleston",
+  "pop_2020": 790955,
+  "pop_2010": 664607,
+  "growth_pct_2010_2020": 19.0,
+  "total_tracts": 178
+}
