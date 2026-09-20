@@ -1,0 +1,43 @@
+{
+  "city": "Sumter",
+  "state": "SC",
+  "county": "Sumter",
+  "counties": [
+    "Sumter"
+  ],
+  "fips_state": "45",
+  "fips_county": [
+    "085"
+  ],
+  "center": {
+    "lng": -80.3412,
+    "lat": 33.9204
+  },
+  "acs_vintage": 2024,
+  "total_tracts": 26,
+  "pop_2020": 106675,
+  "pop_2010": 84700,
+  "growth_pct_2010_2020": -3.3,
+  "county_population_by_year": {
+    "Sumter": {
+      "2014": 107782,
+      "2015": 107777,
+      "2016": 107682,
+      "2017": 107379,
+      "2018": 106995,
+      "2019": 106757,
+      "2020": 106675,
+      "2021": 105537,
+      "2022": 105199,
+      "2023": 104853,
+      "2024": 104725
+    }
+  },
+  "growth_basis": {
+    "comparable_tracts": 20,
+    "total_tracts": 26,
+    "pop_2010": 84700,
+    "pop_2020": 81893,
+    "note": "Growth compares only tracts reporting both 2010 and 2020 counts; 6 tracts had boundary changes and are excluded."
+  }
+}

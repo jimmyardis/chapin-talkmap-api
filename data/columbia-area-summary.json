@@ -2,17 +2,24 @@
   "city": "Columbia",
   "state": "SC",
   "county": "Richland",
+  "counties": [
+    "Richland",
+    "Lexington"
+  ],
   "fips_state": "45",
-  "fips_county": "079",
+  "fips_county": [
+    "079",
+    "063"
+  ],
   "center": {
     "lng": -81.0348,
     "lat": 34.0007
   },
-  "total_tracts": 98,
-  "greater_area_tracts": 92,
-  "pop_2020": 414660,
-  "pop_2010": 282083,
-  "growth_pct_2010_2020": 47.0,
+  "acs_vintage": 2024,
+  "total_tracts": 190,
+  "pop_2020": 709693,
+  "pop_2010": 467039,
+  "growth_pct_2010_2020": 4.7,
   "county_population_by_year": {
     "Richland": {
       "2014": 393707,
@@ -23,7 +30,29 @@
       "2019": 411357,
       "2020": 414660,
       "2021": 414719,
-      "2022": 416161
+      "2022": 416161,
+      "2023": 418725,
+      "2024": 422117
+    },
+    "Lexington": {
+      "2014": 270263,
+      "2015": 273843,
+      "2016": 277702,
+      "2017": 281870,
+      "2018": 286316,
+      "2019": 290278,
+      "2020": 295033,
+      "2021": 291723,
+      "2022": 295934,
+      "2023": 300370,
+      "2024": 304887
     }
+  },
+  "growth_basis": {
+    "comparable_tracts": 133,
+    "total_tracts": 190,
+    "pop_2010": 467039,
+    "pop_2020": 488910,
+    "note": "Growth compares only tracts reporting both 2010 and 2020 counts; 57 tracts had boundary changes and are excluded."
   }
 }

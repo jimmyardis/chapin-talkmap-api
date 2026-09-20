@@ -50,9 +50,12 @@ const CITIES = {
   chapin:     loadCity('chapin'),
   charleston: loadCity('charleston'),
   columbia:   loadCity('columbia'),
+  sumter:     loadCity('sumter'),
 };
 
-const CITY_ORDER = ['charleston', 'columbia', 'chapin'];   // search priority
+// Search priority: broadest metro first, then the scoped towns. Chapin sits
+// inside the Columbia metro, so it must come after Columbia.
+const CITY_ORDER = ['charleston', 'columbia', 'sumter', 'chapin'];
 
 // City-specific contextual notes
 const CITY_NOTES = {
@@ -60,7 +63,9 @@ const CITY_NOTES = {
     lexington:  'Most of Chapin proper is in Lexington County.',
     richland:   'White Rock and the eastern Greater Chapin area are in Richland County.',
     area_label: 'Greater Chapin area',
-    area_flag:  f => f.properties.is_greater_chapin === true,
+    // Every tract in this build is already clipped to 20 km of Chapin by
+    // execution/scope_city.py, so all of them are in the greater area.
+    area_flag:  f => true,
   },
   charleston: {
     charleston: 'City of Charleston is in Charleston County.',
@@ -71,8 +76,14 @@ const CITY_NOTES = {
   },
   columbia: {
     richland:   'Columbia is the seat of Richland County, the state capital of South Carolina.',
-    area_label: 'Richland County / Columbia metro',
-    area_flag:  f => f.properties.is_greater_area === true,
+    lexington:  'Lexington County covers the western half of the Columbia metro, including Irmo, Lexington and West Columbia.',
+    area_label: 'Richland + Lexington / Columbia metro',
+    area_flag:  f => true,
+  },
+  sumter: {
+    sumter:     'Sumter is the seat of Sumter County. Shaw Air Force Base sits northwest of the city.',
+    area_label: 'Sumter County',
+    area_flag:  f => true,
   },
 };
 
