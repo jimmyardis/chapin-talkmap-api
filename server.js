@@ -22,6 +22,7 @@
    ============================================================ */
 
 const express = require('express');
+const { lookupPlace } = require('./place-lookup.cjs');
 const fs      = require('fs');
 const path    = require('path');
 
@@ -45,6 +46,11 @@ function loadCity(slug) {
     return null;
   }
 }
+
+const COLLOQUIAL_ALL = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'colloquial.json'), 'utf-8')); }
+  catch (e) { console.warn('⚠️  colloquial.json missing —', e.message); return {}; }
+})();
 
 const CITIES = {
   chapin:     loadCity('chapin'),
@@ -178,104 +184,106 @@ function detectCity(name, hint) {
 // =============================================================
 // TOOL IMPLEMENTATIONS
 // =============================================================
+// Places carry Census place-level population (execution/enrich_places.py).
+// Before that they held only a name and a boundary, so "population of Chapin
+// town" came back with no number at all.
+function placeResult(place, summary) {
+  const p = place.properties;
+  const out = {
+    name: p.display_name,
+    city: summary.city,
+    type: p.kind,
+    notes: p.tooltip,
+  };
+  if (p.pop_2020_dec != null) out.population_2020 = p.pop_2020_dec;
+  if (p.pop_2010_dec != null) out.population_2010 = p.pop_2010_dec;
+  if (p.growth_pct_2010_2020 != null) out.growth_pct_2010_2020 = p.growth_pct_2010_2020;
+
+  const history = {};
+  for (let y = 2014; y <= 2024; y++) {
+    if (p[`pop_${y}`] != null) history[y] = p[`pop_${y}`];
+  }
+  if (Object.keys(history).length) {
+    out.population_by_year = history;
+    out.population_latest = history[2024] ?? history[Math.max(...Object.keys(history).map(Number))];
+    out.population_note = 'Decennial counts are exact; the yearly series is ACS 5-year and will not match them exactly.';
+  }
+  if (out.population_2020 == null && out.population_latest == null) {
+    out.has_own_population = false;
+    out.note = 'No census population is published for this place.';
+  }
+  return out;
+}
+
+function mapAreaResult(summary) {
+  return {
+    name: `Greater ${summary.city}`,
+    type: 'map_area',
+    description: `The ${summary.total_tracts} census tracts this map covers`,
+    state: 'SC',
+    counties: summary.counties,
+    total_population_2020: summary.pop_2020,
+    total_population_2010: summary.pop_2010,
+    growth_pct_2010_2020: summary.growth_pct_2010_2020,
+    total_tracts: summary.total_tracts,
+    growth_basis: summary.growth_basis || null,
+  };
+}
+
+// Local names people actually use that have no census geography behind them.
+const COLLOQUIAL = {
+  chapin: {
+    'white rock':      { name: 'White Rock', note: 'An unincorporated community in Richland County on the north shore of Lake Murray, inside the Greater Chapin area.' },
+    'ballentine':      { name: 'Ballentine', note: 'An unincorporated community between Chapin and Irmo, in Richland County.' },
+    'lake murray':     { name: 'Lake Murray', note: 'A 50,000-acre reservoir on the Saluda River, the defining feature of the Chapin area. It is water, so it has no population.' },
+    'lake murray dam': { name: 'Lake Murray Dam', note: 'Also called the Saluda Dam, at the lake’s eastern end near Irmo.' },
+    'dutch fork':      { name: 'Dutch Fork', note: 'The historic region between the Broad and Saluda Rivers, covering Chapin, Irmo and Ballentine.' },
+  },
+  columbia: {
+    'five points':  { name: 'Five Points', note: 'An entertainment and shopping district just east of the USC campus.' },
+    'the vista':    { name: 'The Vista', note: 'The Congaree Vista, a warehouse district turned restaurant and gallery quarter between downtown and the river.' },
+    'vista':        { name: 'The Vista', note: 'The Congaree Vista, a warehouse district turned restaurant and gallery quarter between downtown and the river.' },
+    'shandon':      { name: 'Shandon', note: 'An early-20th-century residential neighbourhood east of downtown.' },
+    'fort jackson': { name: 'Fort Jackson', note: 'The US Army installation covering much of eastern Richland County; it is counted in the surrounding tracts.' },
+    'usc':          { name: 'University of South Carolina', note: 'The main campus anchors downtown Columbia; students are counted in the surrounding tracts.' },
+    'lake murray':  { name: 'Lake Murray', note: 'A reservoir on the Richland/Lexington line, northwest of the city. It is water, so it has no population.' },
+  },
+  charleston: {
+    'west ashley':   { name: 'West Ashley', note: 'The part of the City of Charleston west of the Ashley River. It has no single census boundary.' },
+    'the peninsula': { name: 'The Charleston peninsula', note: 'Downtown Charleston between the Ashley and Cooper Rivers.' },
+    'peninsula':     { name: 'The Charleston peninsula', note: 'Downtown Charleston between the Ashley and Cooper Rivers.' },
+    'the battery':   { name: 'The Battery', note: 'The promenade and historic district at the southern tip of the peninsula.' },
+    'shem creek':    { name: 'Shem Creek', note: 'A working creek and restaurant strip in Mount Pleasant.' },
+    'tri-county':    { name: 'The tri-county area', note: 'Charleston, Berkeley and Dorchester Counties together.' },
+  },
+  sumter: {
+    'shaw':            { name: 'Shaw Air Force Base', note: 'Home of the 20th Fighter Wing, northwest of the city. Its personnel are counted in the surrounding tracts.' },
+    'shaw afb':        { name: 'Shaw Air Force Base', note: 'Home of the 20th Fighter Wing, northwest of the city. Its personnel are counted in the surrounding tracts.' },
+    'shaw air force base': { name: 'Shaw Air Force Base', note: 'Home of the 20th Fighter Wing, northwest of the city. Its personnel are counted in the surrounding tracts.' },
+    'swan lake':       { name: 'Swan Lake Iris Gardens', note: 'A public garden in downtown Sumter, the only US public park hosting all eight swan species.' },
+    'manchester':      { name: 'Manchester State Forest', note: 'State forest covering much of southern Sumter County.' },
+    'manchester state forest': { name: 'Manchester State Forest', note: 'State forest covering much of southern Sumter County.' },
+  },
+};
+
 const TOOLS = {
 
-  get_place_info({ name, year, city: cityHint }) {
-    if (!name) return { error: 'Need a place name to look up.' };
-    const n = String(name).toLowerCase().trim();
-    const yearStr = year != null ? String(year) : null;
-
-    // Try to find in a specific city first, then fall back to searching all
-    const citiesToSearch = cityHint
+  get_place_info({ name, city: cityHint }) {
+    // Same implementation the browser runs (shared/place-lookup.js in
+    // the townring repo), so a phone call and a browser session cannot
+    // give different answers to the same question.
+    const targets = cityHint
       ? [detectCity(name, cityHint)].filter(Boolean)
       : CITY_ORDER.map(s => CITIES[s]).filter(Boolean);
-
-    for (const cityData of citiesToSearch) {
-      const { slug, tracts, places, summary } = cityData;
-      const notes = CITY_NOTES[slug] || {};
-
-      // 1. County match
-      for (const [county, years] of Object.entries(summary.county_population_by_year || {})) {
-        if (n.includes(county.toLowerCase())) {
-          const countyTracts = tracts.features.filter(
-            f => String(f.properties.county_name || '').toLowerCase() === county.toLowerCase()
-          );
-          return {
-            name: `${county} County, SC`,
-            city: summary.city,
-            type: 'county',
-            population_by_year: years,
-            growth_pct_2010_2020: years[2010] && years[2020]
-              ? Math.round((years[2020] - years[2010]) / years[2010] * 1000) / 10 : null,
-            demographics: areaAggregates(countyTracts, `${county} County`),
-            note: notes[county.toLowerCase()] || null,
-          };
-        }
-      }
-
-      // 2. Place match (city name exact)
-      if (summary.city && summary.city.toLowerCase() === n) {
-        return {
-          name: summary.city,
-          type: 'city',
-          state: 'SC',
-          county: summary.county,
-          total_population_2020: summary.pop_2020,
-          total_population_2010: summary.pop_2010,
-          growth_pct_2010_2020: summary.growth_pct_2010_2020,
-          total_tracts: summary.total_tracts,
-        };
-      }
-
-      // 3. Places GeoJSON
-      const place = places.features.find(f => {
-        const dn = String(f.properties.display_name || '').toLowerCase();
-        const bn = String(f.properties.BASENAME || '').toLowerCase();
-        return dn.includes(n) || (bn && (n.includes(bn) || bn.includes(n)));
-      });
-      if (place) {
-        const result = {
-          name: place.properties.display_name,
-          city: summary.city,
-          type: place.properties.kind,
-          notes: place.properties.tooltip,
-        };
-        return result;
-      }
-
-      // 4. Tract by number or name
-      const digits = n.replace(/\D/g, '');
-      const tract = tracts.features.find(f => {
-        const t  = String(f.properties.TRACT || '');
-        const tn = String(f.properties.NAME  || '').toLowerCase();
-        return (digits && t.includes(digits)) || tn.includes(n);
-      });
-      if (tract) {
-        const p = tract.properties;
-        const result = {
-          name: p.NAME,
-          city: summary.city,
-          type: 'census_tract',
-          county: `${p.county_name} County, SC`,
-          population_2010: p.pop_2010,
-          population_2020: p.pop_2020,
-          growth_pct_2010_to_2020: p.growth_pct,
-          median_household_income: p.median_income,
-          median_age: p.median_age,
-          density_per_sqkm: p.density_per_sqkm,
-        };
-        if (yearStr && p[`pop_${yearStr}`] != null) result[`population_${yearStr}`] = p[`pop_${yearStr}`];
-        const history = {};
-        for (let y = 2014; y <= 2022; y++) {
-          if (p[`pop_${y}`] != null) history[y] = p[`pop_${y}`];
-        }
-        if (Object.keys(history).length > 0) result.population_history = history;
-        if (!p.has_2010) result.note = 'This tract did not exist in 2010 — created when a larger tract was split.';
-        return result;
-      }
+    for (const c of targets) {
+      const r = lookupPlace(name, {
+        tracts: c.tracts, places: c.places, summary: c.summary,
+        colloquial: COLLOQUIAL_ALL[c.slug] || {},
+      }, c.slug);
+      if (r && !r.error) return { ...r, city: c.summary.city };
     }
-
-    return { error: `Couldn't find a place matching "${name}". Try a city name, county, or neighborhood.` };
+    return { error: `Couldn't find a place matching "${name}".`,
+             suggestion: 'Try a town name, a county, or a census tract number.' };
   },
 
   get_tract_population_history({ tract, city: cityHint }) {

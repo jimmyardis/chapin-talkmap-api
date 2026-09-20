@@ -1,0 +1,106 @@
+{
+  "chapin": {
+    "white rock": {
+      "name": "White Rock",
+      "note": "An unincorporated community in Richland County on the north shore of Lake Murray, inside the Greater Chapin area."
+    },
+    "ballentine": {
+      "name": "Ballentine",
+      "note": "An unincorporated community between Chapin and Irmo, in Richland County."
+    },
+    "lake murray": {
+      "name": "Lake Murray",
+      "note": "A 50,000-acre reservoir on the Saluda River, the defining feature of the Chapin area. It is water, so it has no population."
+    },
+    "lake murray dam": {
+      "name": "Lake Murray Dam",
+      "note": "Also called the Saluda Dam, at the lake’s eastern end near Irmo."
+    },
+    "dutch fork": {
+      "name": "Dutch Fork",
+      "note": "The historic region between the Broad and Saluda Rivers, covering Chapin, Irmo and Ballentine."
+    }
+  },
+  "columbia": {
+    "five points": {
+      "name": "Five Points",
+      "note": "An entertainment and shopping district just east of the USC campus."
+    },
+    "the vista": {
+      "name": "The Vista",
+      "note": "The Congaree Vista, a warehouse district turned restaurant and gallery quarter between downtown and the river."
+    },
+    "vista": {
+      "name": "The Vista",
+      "note": "The Congaree Vista, a warehouse district turned restaurant and gallery quarter between downtown and the river."
+    },
+    "shandon": {
+      "name": "Shandon",
+      "note": "An early-20th-century residential neighbourhood east of downtown."
+    },
+    "fort jackson": {
+      "name": "Fort Jackson",
+      "note": "The US Army installation covering much of eastern Richland County; it is counted in the surrounding tracts."
+    },
+    "usc": {
+      "name": "University of South Carolina",
+      "note": "The main campus anchors downtown Columbia; students are counted in the surrounding tracts."
+    },
+    "lake murray": {
+      "name": "Lake Murray",
+      "note": "A reservoir on the Richland/Lexington line, northwest of the city. It is water, so it has no population."
+    }
+  },
+  "charleston": {
+    "west ashley": {
+      "name": "West Ashley",
+      "note": "The part of the City of Charleston west of the Ashley River. It has no single census boundary."
+    },
+    "the peninsula": {
+      "name": "The Charleston peninsula",
+      "note": "Downtown Charleston between the Ashley and Cooper Rivers."
+    },
+    "peninsula": {
+      "name": "The Charleston peninsula",
+      "note": "Downtown Charleston between the Ashley and Cooper Rivers."
+    },
+    "the battery": {
+      "name": "The Battery",
+      "note": "The promenade and historic district at the southern tip of the peninsula."
+    },
+    "shem creek": {
+      "name": "Shem Creek",
+      "note": "A working creek and restaurant strip in Mount Pleasant."
+    },
+    "tri-county": {
+      "name": "The tri-county area",
+      "note": "Charleston, Berkeley and Dorchester Counties together."
+    }
+  },
+  "sumter": {
+    "shaw": {
+      "name": "Shaw Air Force Base",
+      "note": "Home of the 20th Fighter Wing, northwest of the city. Its personnel are counted in the surrounding tracts."
+    },
+    "shaw afb": {
+      "name": "Shaw Air Force Base",
+      "note": "Home of the 20th Fighter Wing, northwest of the city. Its personnel are counted in the surrounding tracts."
+    },
+    "shaw air force base": {
+      "name": "Shaw Air Force Base",
+      "note": "Home of the 20th Fighter Wing, northwest of the city. Its personnel are counted in the surrounding tracts."
+    },
+    "swan lake": {
+      "name": "Swan Lake Iris Gardens",
+      "note": "A public garden in downtown Sumter, the only US public park hosting all eight swan species."
+    },
+    "manchester": {
+      "name": "Manchester State Forest",
+      "note": "State forest covering much of southern Sumter County."
+    },
+    "manchester state forest": {
+      "name": "Manchester State Forest",
+      "note": "State forest covering much of southern Sumter County."
+    }
+  }
+}
