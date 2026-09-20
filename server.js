@@ -57,6 +57,29 @@ const CITIES = {
 // inside the Columbia metro, so it must come after Columbia.
 const CITY_ORDER = ['charleston', 'columbia', 'sumter', 'chapin'];
 
+// The 10 Vapi tools are shared by all four assistants, so a tool call arrives
+// with no idea which map the caller is looking at. Without a hint the tools
+// fall back to searching every city in CITY_ORDER, which is how a Charleston
+// caller once got Chapin's numbers. The assistant id is the one thing Vapi
+// always sends that identifies the city, so resolve from that rather than
+// trusting the model to pass a `city` argument it could forget.
+const ASSISTANT_CITY = {
+  'ac689a99-081e-4f4e-8d80-746e6d7daa6a': 'chapin',
+  'bdc929fb-5dbb-43ee-84f6-8f51b26c85b9': 'charleston',
+  'eed4637f-c1f2-47f0-a896-f93c38532f1b': 'columbia',
+  'e569e4e4-4cb2-4806-a1aa-9888d2381318': 'sumter',
+};
+
+// Vapi has moved this field around between payload shapes; check every place
+// it has been known to appear, then fall back to ?city= on the server URL.
+function resolveCityHint(message, query) {
+  const id = message?.assistant?.id
+          || message?.call?.assistantId
+          || message?.call?.assistant?.id
+          || message?.assistantId;
+  return ASSISTANT_CITY[id] || query?.city || null;
+}
+
 // City-specific contextual notes
 const CITY_NOTES = {
   chapin: {
@@ -441,12 +464,19 @@ app.post('/api/vapi-tool', (req, res) => {
     return res.status(400).json({ error: 'No tool calls in request body.', received: req.body });
   }
 
+  const cityHint = resolveCityHint(message, req.query);
+  console.log(`📍 city hint: ${cityHint || 'NONE (will search all cities)'}`);
+
   const results = toolCallList.map((call) => {
     const fnName  = call.function?.name      || call.name;
     const rawArgs = call.function?.arguments ?? call.arguments ?? '{}';
     let args;
     try { args = typeof rawArgs === 'string' ? JSON.parse(rawArgs) : rawArgs; }
     catch { args = {}; }
+
+    // Every data tool takes `city`; pin it to the calling assistant's map
+    // unless the model deliberately asked about a different one.
+    if (cityHint && args && args.city == null) args.city = cityHint;
 
     const fn = TOOLS[fnName];
     let result;
